@@ -12,7 +12,9 @@ using System.Collections;
 
 using System.ComponentModel;
 using System.Collections.Generic;
-
+using System.Linq;
+using System.Threading.Tasks;
+using EpPathFinding.cs;
 //using Algorithms;
 //using System.Globalization;
 
@@ -49,7 +51,7 @@ namespace rimworldripoff
         //  int partid;
         //  Point xy;
         //Point oldxy;
-        public byte[,] grid;
+      //  public int[,] grid;
 
 
 
@@ -59,22 +61,22 @@ namespace rimworldripoff
         {
 
             InitializeComponent();
-            SizeNud.Value = 4;
+            SizeNud.Value = 10;
             Reset(0);
         }
-        public int NextPowerOf2(int x)
+       /* public int NextPowerOf2(int x)
         {
 
             return (int)Math.Pow(2, (int)Math.Log(x - 1, 2));
 
-            /*    while (number > 0)
+                while (number > 0)
                 {
                     pos++;
                     number = number >> 1;
-                }*/
+                }
 
 
-        }
+        }*/
         // GUI actions that require a board reset
         private void ResetButton_Click(object sender, EventArgs e) { Reset(0); }
         private void pictureBox1_SizeChanged(object sender, EventArgs e) { }
@@ -83,7 +85,7 @@ namespace rimworldripoff
 
         private void Reset(int gamemode)
         {
-            //   int tempx = pictureBox1.Width / (int)SizeNud.Value, tempy = pictureBox1.Height / (int)SizeNud.Value, lessorx = 0, lessory = 0;;
+         /*   //   int tempx = pictureBox1.Width / (int)SizeNud.Value, tempy = pictureBox1.Height / (int)SizeNud.Value, lessorx = 0, lessory = 0;;
             if (Math.Log(pictureBox1.Width / (int)SizeNud.Value, 2) != (int)Math.Log(pictureBox1.Width / (int)SizeNud.Value, 2))
             {
                 pictureBox1.Width = NextPowerOf2(pictureBox1.Width / (int)SizeNud.Value) * (int)SizeNud.Value;// 1024 + (int)SizeNud.Value;//
@@ -91,7 +93,7 @@ namespace rimworldripoff
             if (Math.Log(pictureBox1.Height / (int)SizeNud.Value, 2) != (int)Math.Log(pictureBox1.Height / (int)SizeNud.Value, 2))    
                 {
                 pictureBox1.Height = NextPowerOf2(pictureBox1.Height / (int)SizeNud.Value) * (int)SizeNud.Value;//512 + (int)SizeNud.Value; //
-            }
+            }*/
             board = new Board(pictureBox1.Width, pictureBox1.Height, (int)SizeNud.Value);
             try
             {
@@ -100,7 +102,7 @@ namespace rimworldripoff
             }
             catch { }
         
-            grid = new byte[pictureBox1.Width / board.CellSize, pictureBox1.Height / board.CellSize];
+            //grid = new int[pictureBox1.Width / board.CellSize, pictureBox1.Height / board.CellSize];
             totalparticles = 0;
             totalticks = 0;
             totaltime.Restart();
@@ -219,7 +221,7 @@ namespace rimworldripoff
 
                 UpdateCell(board.redrawcells[cellnumb][1], new Point(board.redrawcells[cellnumb][2], board.redrawcells[cellnumb][3]));
               }
-            try
+/*            try
             {
                 for (int xbyte = 0; xbyte < pictureBox1.Width / board.CellSize; xbyte++)
                 {
@@ -227,16 +229,16 @@ namespace rimworldripoff
                     {
                         if (board.Cells[xbyte, ybyte].Alive)
                         {
-                            grid[xbyte, ybyte] = 0;
+                            grid[xbyte, ybyte] = 1;
                         }
                         else
                         {
-                            grid[xbyte, ybyte] = 1;
+                            grid[xbyte, ybyte] = 0;
                         }
                     }
                 }
             }
-            catch { }
+            catch { }*/
 
             Render(true, 0, new Point(0, 0), new int[0]);
             //   board.redrawcells.Clear();
@@ -565,7 +567,6 @@ namespace rimworldripoff
 
 
 
-
             }
 
         }
@@ -769,7 +770,8 @@ namespace rimworldripoff
                             board.Cells[xy.X, xy.Y].color = new int[] { 127, 76, 69, 50 };
                             board.Cells[xy.X, xy.Y].path = null;
                             board.Cells[xy.X, xy.Y].pathfinding = false;
-
+                            board.Cells[xy.X, xy.Y].counter = 0;
+                            board.Cells[xy.X, xy.Y].speedtimer = 5;
                             // board.Cells[xy.X, xy.Y].redraw = true;
                             board.Cells[xy.X, xy.Y].created = false;
 
@@ -862,6 +864,7 @@ namespace rimworldripoff
         }
         public void UpdateCell(int partid, Point xy)
         {
+            Point oneone = new Point(1, 1);
             try
             {
             if (!board.Cells[xy.X, xy.Y].created)
@@ -872,14 +875,57 @@ namespace rimworldripoff
                 board.Cells[xy.X, xy.Y].created = true;
             }
 
-            if(!board.Cells[xy.X, xy.Y].pathfinding && board.Cells[xy.X, xy.Y].path == null && board.Cells[xy.X, xy.Y].type == 1)
+            if(!board.Cells[xy.X, xy.Y].pathfinding && board.Cells[xy.X, xy.Y].path == null && board.Cells[xy.X, xy.Y].type == 1 && oneone != xy)
                 {
                     board.Cells[xy.X, xy.Y].pathfinding = true;
-                    Runpf(board.Cells[xy.X, xy.Y].partid, new Point(1, 1), xy);
+                    Runpf(board.Cells[xy.X, xy.Y].partid, oneone, xy, false);
                 }
 
+           if(board.Cells[xy.X, xy.Y].path != null && board.Cells[xy.X, xy.Y].counter > 10 && board.Cells[xy.X, xy.Y].vx == 0 && board.Cells[xy.X, xy.Y].vy == 0)
+                {
+                  //  if (board.Cells[xy.X, xy.Y].secpath == null)
+               //     {
 
-            
+                        int positiononpath = board.Cells[xy.X, xy.Y].path.IndexOf(new GridPos(xy.X, xy.Y));
+                        if (board.Cells[xy.X, xy.Y].path.Count > positiononpath && positiononpath >= 0)
+                        {
+                            Point newvxy = new Point(xy.X - board.Cells[xy.X, xy.Y].path[positiononpath + 1].x, xy.Y - board.Cells[xy.X, xy.Y].path[positiononpath + 1].y);
+                            board.Cells[xy.X, xy.Y].vx -= newvxy.X;
+                            board.Cells[xy.X, xy.Y].vy -= newvxy.Y;
+                            board.Cells[xy.X, xy.Y].counter = 0;
+                        }
+                        else if(board.Cells[xy.X, xy.Y].path.Count == positiononpath && oneone == xy)
+                        {
+                            board.Cells[xy.X, xy.Y].path = null;
+                        }
+                                
+                        if (positiononpath == -1)
+                        {
+                          //  board.Cells[xy.X, xy.Y].pathfinding = true;
+                           // Runpf(board.Cells[xy.X, xy.Y].partid, new Point(1, 1), xy, true);
+                        }
+               //     }
+              /*      else
+                    {
+                        int positiononpathsec = board.Cells[xy.X, xy.Y].secpath.IndexOf(new GridPos(xy.X, xy.Y));
+                        if (board.Cells[xy.X, xy.Y].secpath.Count > positiononpathsec && positiononpathsec >= 0)
+                        {
+                            Point newvxy = new Point(xy.X - board.Cells[xy.X, xy.Y].secpath[positiononpathsec + 1].x, xy.Y - board.Cells[xy.X, xy.Y].secpath[positiononpathsec + 1].y);
+                            board.Cells[xy.X, xy.Y].vx += newvxy.X;
+                            board.Cells[xy.X, xy.Y].vy += newvxy.Y;
+                            board.Cells[xy.X, xy.Y].counter = 0;
+                        }
+                        else if (board.Cells[xy.X, xy.Y].secpath.Count == positiononpathsec || positiononpathsec == -1)
+                        {
+                            board.Cells[xy.X, xy.Y].secpath = null;
+                        }
+                        // if (positiononpath == -1)
+                        //    {
+                        //           Runpf(board.Cells[xy.X, xy.Y].partid, new Point(1, 1), xy, true);
+                        //     }
+                    }*/
+                    
+                }
                 //  if (!created)
                 //    Create();
 
@@ -913,7 +959,7 @@ namespace rimworldripoff
                 {
                     board.Cells[xy.X, xy.Y].xy = CellMovement(xy, 0, 0, board.Cells[xy.X, xy.Y].partid, new Point(board.partids[board.Cells[xy.X, xy.Y].partid][1], board.partids[board.Cells[xy.X, xy.Y].partid][2]));
                 }*/
-                if (Math.Abs(board.Cells[xy.X, xy.Y].vx) > 0 || Math.Abs(board.Cells[xy.X, xy.Y].vy) > 0)
+                if (Math.Abs(board.Cells[xy.X, xy.Y].vx) > 0 || Math.Abs(board.Cells[xy.X, xy.Y].vy) > 0 && board.Cells[xy.X, xy.Y].speedtimer > board.Cells[xy.X, xy.Y].speeddelay)
                 {
                     board.Cells[xy.X, xy.Y].xy = CellMovement(board.Cells[xy.X, xy.Y].xy, board.Cells[xy.X, xy.Y].vx, board.Cells[xy.X, xy.Y].vy);
                     //  Form1 form1 = new Form1();
@@ -924,10 +970,10 @@ namespace rimworldripoff
                     //xy = new Point(xy.X + vx, xy.Y + vy);
                     //    redraw = true;
                 }
-               // if(board.Cells[xy.X, xy.Y].xy != xy)
-              //  {
-            //        MoveCell(partid, board.Cells[xy.X, xy.Y].xy, xy);
-           //     }
+                // if(board.Cells[xy.X, xy.Y].xy != xy)
+                //  {
+                //        MoveCell(partid, board.Cells[xy.X, xy.Y].xy, xy);
+                //     }
 
 
                 // if()
@@ -943,8 +989,8 @@ namespace rimworldripoff
                 //   }
 
 
-
-
+                board.Cells[xy.X, xy.Y].speedtimer++;
+                board.Cells[xy.X, xy.Y].counter++;
             }
             catch { }
 
@@ -1002,10 +1048,10 @@ namespace rimworldripoff
             richTextBox1.ScrollToCaret();
         }
 
-        public void Runpf(int partid, Point oldxy, Point destinationxy)
+        public void Runpf(int partid, Point oldxy, Point destinationxy, bool secpath)
         {
             pathfindthread pathfindtrheade = new pathfindthread();
-            pathfindtrheade.Runpf(partid, oldxy, destinationxy, grid);
+            pathfindtrheade.Runpf(partid, oldxy, destinationxy, secpath);
             //   board.Cells.Refresh();
             //  BtnStartStop.Text = STOP;
             //    ToolStrp.Enabled = false;

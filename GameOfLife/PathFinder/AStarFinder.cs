@@ -116,10 +116,6 @@ namespace EpPathFinding.cs
                             }
                             neighbor.isOpened = true;
                         }
-                        else
-                        {
-
-                        }
                     }
                 }
 #if (!UNITY)

@@ -181,51 +181,53 @@ namespace EpPathFinding.cs
         }
         public static List<GridPos> FindPath(JumpPointParam iParam)
         {
-
-            IntervalHeap<Node> tOpenList = iParam.openList;
-            Node tStartNode = iParam.StartNode;
-            Node tEndNode = iParam.EndNode;
-            Node tNode;
-            bool revertEndNodeWalkable = false;
-
-            // set the `g` and `f` value of the start node to be 0
-            tStartNode.startToCurNodeLen = 0;
-            tStartNode.heuristicStartToEndLen = 0;
-
-            // push the start node into the open list
-            tOpenList.Add(tStartNode);
-            tStartNode.isOpened = true;
-
-            if (iParam.CurEndNodeUnWalkableTreatment == EndNodeUnWalkableTreatment.ALLOW && !iParam.SearchGrid.IsWalkableAt(tEndNode.x, tEndNode.y))
+            try
             {
-                iParam.SearchGrid.SetWalkableAt(tEndNode.x, tEndNode.y, true);
-                revertEndNodeWalkable = true;
-            }
+                IntervalHeap<Node> tOpenList = iParam.openList;
+                Node tStartNode = iParam.StartNode;
+                Node tEndNode = iParam.EndNode;
+                Node tNode;
+                bool revertEndNodeWalkable = false;
 
-            // while the open list is not empty
-            while (tOpenList.Count > 0)
-            {
-                // pop the position of node which has the minimum `f` value.
-                tNode = tOpenList.DeleteMin();
-                tNode.isClosed = true;
+                // set the `g` and `f` value of the start node to be 0
+                tStartNode.startToCurNodeLen = 0;
+                tStartNode.heuristicStartToEndLen = 0;
 
-                if (tNode.Equals(tEndNode))
+                // push the start node into the open list
+                tOpenList.Add(tStartNode);
+                tStartNode.isOpened = true;
+
+                if (iParam.CurEndNodeUnWalkableTreatment == EndNodeUnWalkableTreatment.ALLOW && !iParam.SearchGrid.IsWalkableAt(tEndNode.x, tEndNode.y))
                 {
-                    if (revertEndNodeWalkable)
-                    {
-                        iParam.SearchGrid.SetWalkableAt(tEndNode.x, tEndNode.y, false);
-                    }
-                    return Node.Backtrace(tNode); // rebuilding path
+                    iParam.SearchGrid.SetWalkableAt(tEndNode.x, tEndNode.y, true);
+                    revertEndNodeWalkable = true;
                 }
 
-                identifySuccessors(iParam, tNode);
-            }
+                // while the open list is not empty
+                while (tOpenList.Count > 0)
+                {
+                    // pop the position of node which has the minimum `f` value.
+                    tNode = tOpenList.DeleteMin();
+                    tNode.isClosed = true;
 
-            if (revertEndNodeWalkable)
-            {
-                iParam.SearchGrid.SetWalkableAt(tEndNode.x, tEndNode.y, false);
-            }
+                    if (tNode.Equals(tEndNode))
+                    {
+                        if (revertEndNodeWalkable)
+                        {
+                            iParam.SearchGrid.SetWalkableAt(tEndNode.x, tEndNode.y, false);
+                        }
+                        return Node.Backtrace(tNode); // rebuilding path
+                    }
 
+                    identifySuccessors(iParam, tNode);
+                }
+
+                if (revertEndNodeWalkable)
+                {
+                    iParam.SearchGrid.SetWalkableAt(tEndNode.x, tEndNode.y, false);
+                }
+            }
+            catch { }
             // fail to find the path
             return new List<GridPos>();
         }
@@ -425,13 +427,13 @@ namespace EpPathFinding.cs
                                 if ((iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY)) ||
                                     (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY + currentSnapshot.tDy) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY) && !iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy)))
                                 {
-                                    retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY);
+                                   retVal = new GridPos(currentSnapshot.iX, currentSnapshot.iY);
                                     continue;
                                 }
                             }
                             // horizontally/vertically
                             else
-                            {
+                           {
                                 if (currentSnapshot.tDx != 0)
                                 {
                                     // moving along x
@@ -455,7 +457,7 @@ namespace EpPathFinding.cs
 
 
                             // when moving diagonally, must check for vertical/horizontal jump points
-                            if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0)
+                           if (currentSnapshot.tDx != 0 && currentSnapshot.tDy != 0)
                             {
                                 currentSnapshot.stage = 3;
                                 stack.Push(currentSnapshot);
@@ -469,7 +471,7 @@ namespace EpPathFinding.cs
                                 stack.Push(newSnapshot);
                                 continue;
                             }
-
+ 
                             // moving diagonally, must make sure both of the vertical/horizontal
                             // neighbors is open to allow the path
                             if (iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX + currentSnapshot.tDx, currentSnapshot.iY) && iParam.SearchGrid.IsWalkableAt(currentSnapshot.iX, currentSnapshot.iY + currentSnapshot.tDy))
@@ -483,6 +485,10 @@ namespace EpPathFinding.cs
                                 stack.Push(newSnapshot);
                                 continue;
                             }
+
+
+
+
                         }
                         else // if(iParam.DiagonalMovement == DiagonalMovement.Never)
                         {
