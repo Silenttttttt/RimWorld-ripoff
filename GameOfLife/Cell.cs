@@ -41,12 +41,14 @@ namespace rimworldripoff
         public int redrawid;
         readonly Random rand = new Random();
         public List<GridPos> path;
-        public List<GridPos> secpath;
+       // public List<GridPos> secpath;
         public bool pathfinding;
       //  public bool secpathfinding;
         public int counter;
         public int speedtimer;
         public int speeddelay;
+        public Point destination;
+        public int curpathindex;
         // public string[,] elements = new string[5,20];
 
         // elements[0,0] = "Air";

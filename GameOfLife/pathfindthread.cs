@@ -35,7 +35,7 @@ namespace rimworldripoff
        // Point xy;
        // Point destinationxy;
         //byte[,] grid;
-        public async void Runpf(int partide, Point destinationxye, Point xye, bool secpath)
+        public async void Runpf(int partide, Point destinationxye, Point xye)
         {
             //   board.Cells.Refresh();
             //  BtnStartStop.Text = STOP;
@@ -46,7 +46,7 @@ namespace rimworldripoff
             /* mPFThread = new Thread(RunPathFinder);
               mPFThread.Name = "PathFinder Thread";
               mPFThread.Start();*/
-            await Task.Run(() => RunPathFinder(partide, destinationxye, xye, secpath));
+            await Task.Run(() => RunPathFinder(partide, destinationxye, xye));
         }
 
 
@@ -62,7 +62,7 @@ namespace rimworldripoff
 
 
 
-        public async Task RunPathFinder(int partid, Point destinationxy, Point xy, bool secpath)
+        public async Task RunPathFinder(int partid, Point destinationxy, Point xy)
         {
             await Task.Run(() =>
             {
@@ -131,16 +131,16 @@ namespace rimworldripoff
                JumpPointParam jpParam = new JumpPointParam(searchGrid, startPos, endPos, EndNodeUnWalkableTreatment.ALLOW, DiagonalMovement.OnlyWhenNoObstacles);
 
                 //      jpParam = new JumpPointParam(searchGrid, EndNodeUnWalkableTreatment.ALLOW, DiagonalMovement.OnlyWhenNoObstacles);
-                if (!secpath)
-                {
+               // if (!secpath)
+              //  {
                     Form1.board.Cells[xy.X, xy.Y].path = JumpPointFinder.FindPath(jpParam);//path;
                     Form1.board.Cells[xy.X, xy.Y].pathfinding = false;
-                }
-                else
-                {
-                    Form1.board.Cells[xy.X, xy.Y].secpath = JumpPointFinder.FindPath(jpParam);//path;
-                    Form1.board.Cells[xy.X, xy.Y].pathfinding = false;
-                }
+              //  }
+               // else
+              //  {
+             //       Form1.board.Cells[xy.X, xy.Y].secpath = JumpPointFinder.FindPath(jpParam);//path;
+            //        Form1.board.Cells[xy.X, xy.Y].pathfinding = false;
+               // }
 
                 //   UpdateTimeLabel(mPathFinder.CompletedTime);
 

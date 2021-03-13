@@ -24,9 +24,9 @@ namespace rimworldripoff
         public int Width { get { return Columns * CellSize; } }
         public int Height { get { return Rows * CellSize; } }
 
-        public List<int[]> partids = new List<int[]>();
+        public List<int[]> partids = new List<int[]>(); //help partid x,y??
 
-        public List<int[]> redrawcells = new List<int[]>();// partid xy?
+        public List<int[]> redrawcells = new List<int[]>();// partid x,y?
 
         readonly Random rand = new Random();
 

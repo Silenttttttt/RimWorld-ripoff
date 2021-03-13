@@ -8,7 +8,7 @@ namespace rimworldripoff
 {
     static class Program
     {
-        public static Form1 form1;
+        public static Form1 Form1;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -17,7 +17,7 @@ namespace rimworldripoff
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(form1 = new Form1());
+            Application.Run(Form1 = new Form1());
         }
     }
 }
